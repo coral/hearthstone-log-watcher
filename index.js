@@ -3,13 +3,14 @@ var app = express();
 var socket = require('socket.io-client')('http://10.75.254.80:7162');
 var spawn = require('child_process').spawn;
 
-var tail = spawn('tail', ['-f', '/Users/coral/Library/Logs/Unity/Player.log']);
+var tail = spawn('C:/gnuwin32/bin/tailf.exe', ['C:/Program Files (x86)/Hearthstone/Hearthstone_Data/output_log.txt']);
 
 var turn = true;
 
 var COMPUTER = "left";
 
 socket.on('connect', function(){
+    console.log("hej");
   tail.stdout.on('data', function (data) {
     //console.log(String(data).indexOf('\n'));
 
