@@ -1,13 +1,15 @@
 var express = require('express');
 var app = express();
-var socket = require('socket.io-client')('http://127.0.0.1:3001');
+var socket = require('socket.io-client')('http://10.75.254.80:7162');
 var spawn = require('child_process').spawn;
 
 var tail = spawn('tail', ['-f', '/Users/coral/Library/Logs/Unity/Player.log']);
 
 var turn = true;
 
-//socket.on('connect', function(){
+var COMPUTER = "left";
+
+socket.on('connect', function(){
   tail.stdout.on('data', function (data) {
     //console.log(String(data).indexOf('\n'));
 
@@ -19,21 +21,32 @@ var turn = true;
     	temp = str[i];
     	if(temp.indexOf("END waiting for zone FRIENDLY DECK") != -1)
     	{
-    		console.log("MY TURN");
-        turn = true;
-        //socket.emit("event", turn);
+
+        	console.log("MY TURN");
+            
+            if(!turn)
+            {
+                turn = true;
+                socket.emit("turn", {computer: COMPUTER, turn: turn});
+            }
+
     	}
 
     	if(temp.indexOf("END waiting for zone OPPOSING DECK") != -1)
     	{
-    		console.log("NOT MY TURN");
-        turn = false;
-        //socket.emit("event", turn);
+        	console.log("NOT MY TURN");
+
+            if(turn)
+            {
+                turn = false;
+                socket.emit("turn",  {computer: COMPUTER, turn: turn});
+            }
+        
     	}
     }
     
   });
-//});
+});
 
 
 app.get('*', function(req, res){
